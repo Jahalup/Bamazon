@@ -1,8 +1,11 @@
+// npm packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require('cli-table');
 const chalk = require('chalk');
+var figlet = require('figlet');
 
+// Connection to database
 var connection = mysql.createConnection({
     host: "localhost",
     port: 8889,
@@ -17,14 +20,20 @@ var connection = mysql.createConnection({
 
   connection.connect(function(err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId);
-    maketable();
-   
+    // console.log("connected as id " + connection.threadId);
+    figlet('Bamazon!!!', function(err, data) {
+      if (err) {
+          console.log('Something went wrong...');
+          console.dir(err);
+          return;
+      }
+      console.log(chalk.green((data)));
+      maketable();
+  });
     
-   
-    // console.log(products)
   });
   
+  // Function to make the product table
   function maketable() {
       connection.query("SELECT * FROM products", function(err, results) {
         if (err) throw err;
@@ -46,24 +55,28 @@ var connection = mysql.createConnection({
   })
 };
 
+// Function to run initial prompt questions
 function runprompt() {
   console.log('\n ');
   inquirer
     .prompt([{
       name: "purchase",
       type: "input",
-      message: "Which id# would you like to buy?",
+      message: "Which id# would you like to buy?(or press q to quit)",     
     }, {
       name: "quantity",
-    type: "input",
-    message: "How many would you like to buy?",
+      type: "input",
+      message: "How many would you like to buy?(or press q to quit)",
     }]).then(function(answer) {
+     if(answer.quantity==='q' || answer.purchase==='q') {connection.end()}
+     else {
       connection.query('SELECT * FROM products WHERE ?', {item_id: answer.purchase}, function(err, res) {
         if (err) throw err;
         // console.log(typeof(answer.quantity));
         // console.log(typeof(answer.purchase)); 
         // console.log(res);
         console.log(chalk.green("******You are buying " + answer.quantity + " " + res[0].product_name + "(s)******"));
+//  Checks if there's enough inventory and returns adjusted amount
         if(res[0].stock_quantity >= answer.quantity) {
           connection.query('UPDATE products SET ? WHERE ?',
           [{
@@ -74,7 +87,17 @@ function runprompt() {
           function(err, res) {
             if (err) throw err;
           });
+// Returns total price for items
           console.log(chalk.green("Your total: $ " + (answer.quantity * res[0].price)));
+          figlet('Thank You!!', function(err, data) {
+            if (err) {
+                console.log('Something went wrong...');
+                console.dir(err);
+                return;
+            }
+            console.log(chalk.green((data)));
+           
+        });
           connection.end();
         }
         else {
@@ -82,6 +105,7 @@ function runprompt() {
           connection.end();
         };
       });
+    };
     });
   };
 

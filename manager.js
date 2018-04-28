@@ -1,9 +1,11 @@
+// npm packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var Table = require('cli-table');
 const chalk = require('chalk');
 var figlet = require('figlet');
 
+// Connection to database
 var connection = mysql.createConnection({
     host: "localhost",
     port: 8889,
@@ -29,13 +31,9 @@ var connection = mysql.createConnection({
         console.log(chalk.green((data)));
         runprompt();
     });
-    
-   
-    
-   
-    // console.log(products)
   });
   
+//   Function to make table
   function maketable() {
       connection.query("SELECT * FROM products", function(err, results) {
         if (err) throw err;
@@ -49,18 +47,17 @@ var connection = mysql.createConnection({
                 table.push(
                     [results[i].item_id, results[i].product_name, results[i].department_name, "$" + results[i].price.toFixed(2), results[i].stock_quantity]
                 );
-               
-            }
+            };
            
-            // console.log(chalk.blue.bold("********************Welcome to Bamazon!************************"));
+            console.log(chalk.blue.bold("********************Welcome to Bamazon!************************"));
             console.log(chalk.rgb(255, 136, 0).bold(table.toString()));
             // connection.end();
             runprompt();
             
-  })
+  });
 };
 
-
+// Function to run prompt question with choices
 function runprompt() {
    
     console.log('\n ');
@@ -127,8 +124,8 @@ function runprompt() {
             if (err) throw err;
            
             var table = new Table({
-                    head: ['ID', 'Product', 'Department', 'Price', 'Stock Quantity']
-                  , colWidths: [5, 20, 20, 10, 10]
+                    head: ['ID', 'Product', 'Department', 'Price', 'Stock Quantity'],
+                    colWidths: [5, 20, 20, 10, 10]
                 });
              
                 for (var i = 0; i<results.length; i++) {
@@ -166,7 +163,7 @@ function runprompt() {
                                 });
                                 maketable();
                                 console.log('\n ');
-                                console.log(chalk.yelow("Inventory has been ****updated****"));
+                                console.log(chalk.green("Inventory has been ****updated****"));
                                
                                
                             }
@@ -174,7 +171,6 @@ function runprompt() {
                                 console.log("Unable to update the inventory");
                                
                             };
-
                     });
                 });
             });
@@ -217,7 +213,8 @@ function addproduct() {
             });
             maketable();
             console.log('\n ');
-            console.log(chalk.yellow("You have entered a new item"));
+            console.log(chalk.green("You have entered a new item"));
 
 });
 };
+
