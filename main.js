@@ -30,13 +30,13 @@ var connection = mysql.createConnection({
         if (err) throw err;
        
         var table = new Table({
-                head: ['Item ID', 'Product', 'Department', 'Price', 'Stock Quantity']
+                head: ['ID', 'Product', 'Department', 'Price', 'Stock Quantity']
               , colWidths: [5, 20, 20, 10, 10]
             });
          
             for (var i = 0; i<results.length; i++) {
                 table.push(
-                    [results[i].item_id, results[i].product_name, results[i].department_name, results[i].price, results[i].stock_quantity]
+                    [results[i].item_id, results[i].product_name, results[i].department_name, "$" + results[i].price.toFixed(2), results[i].stock_quantity]
                 );
                
             }
@@ -59,7 +59,7 @@ function runprompt() {
     message: "How many would you like to buy?",
     }]).then(function(answer) {
       connection.query('SELECT * FROM products WHERE ?', {item_id: answer.purchase}, function(err, res) {
-      
+        if (err) throw err;
         // console.log(typeof(answer.quantity));
         // console.log(typeof(answer.purchase)); 
         // console.log(res);
